@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDKT Interaktif</title>
+    <title>Fun Quiz</title>
     <style>
         body {
             background-color: black;
@@ -12,119 +12,165 @@
         }
 
         h1 {
-            margin-top: 80px;
-            font-size: 40px;
-            color: pink;
+            margin-top: 40px;
+            font-size: 36px;
+            color: white;
+        }
+
+        p.sambutan {
+            margin-top: 30px;
+            font-size: 22px;
+            color: white;
         }
 
         button {
             padding: 10px 20px;
             font-size: 18px;
-            background-color: hotpink;
+            background-color: #ff69b4;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             margin: 10px;
+            color: white;
         }
 
         button:hover {
-            background-color: deeppink;
+            background-color: #ff1493;
         }
 
-        #pesan {
+        #quiz, #akhir {
             margin-top: 30px;
             font-size: 24px;
-            color: lightyellow;
+            color: white;
         }
 
-        .heart {
+        /* Partikel */
+        .particle {
             position: absolute;
-            color: red;
-            font-size: 20px;
-            animation: fall 3s linear infinite;
+            border-radius: 50%;
+            background-color: white;
+            width: 5px;
+            height: 5px;
+            opacity: 0.8;
+            animation: fall 3s linear forwards;
         }
 
         @keyframes fall {
-            0% { transform: translateY(-10vh); opacity: 1; }
+            0% { transform: translateY(0); opacity: 1; }
             100% { transform: translateY(100vh); opacity: 0; }
         }
+
+        /* Petasan */
+        .firework {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: explode 1s forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(5) translateY(-200px) translateX(200px); opacity: 0; }
+        }
+
     </style>
 </head>
+<body>
 
-<body onclick="mulaiBGM()">
-
-    <h1>Selamat Datang 💖</h1>
+    <h1>SELAMAT DATANG</h1>
+    <p class="sambutan">INI CUMAN PERTANYAAN TENTANG NGONI PE PANDAGAN KITA PE SIKAP BAGIMANA NEH, CUMAN FUN FUN KWA AMANNN :)</p>
 
     <div id="awal">
-        <button onclick="masuk()">Masuk 🚪</button>
+        <button onclick="mulaiQuiz()">Masuk</button>
     </div>
 
-    <div id="pesan"></div>
+    <div id="quiz"></div>
     <div id="pilihan"></div>
+    <div id="akhir"></div>
 
-    <!-- ========================= -->
-    <!-- 🎵 BACKGROUND MUSIC -->
-    <!-- GANTI background.mp3 DENGAN FILE BGM KAMU -->
+    <!-- BGM -->
     <audio id="bgm" loop>
         <source src="BGM.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- 🔊 SOUND TERIMA -->
-    <!-- GANTI terima.mp3 DENGAN FILE SUARA TERIMA -->
-    <audio id="terimaSound">
-        <source src="SD.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
         var bgm = document.getElementById("bgm");
-        var bgmStarted = false;
 
-        // Mulai BGM setelah klik pertama di layar
-        function mulaiBGM() {
-            if (!bgmStarted) {
-                bgm.play();
-                bgmStarted = true;
+        // =========================
+        // DATA QUIZ
+        var soal = [
+            { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
+            { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
+            { pertanyaan: "Pertanyaan 3: ADA KH TPE TINDAKAN YANG PERNA BKNG NGONI KESAL ATO MARAH 😂?", opsi: ["ADA", "NDAK", "BANYA KALI"] },
+            { pertanyaan: "Pertanyaan 4: APAKAH KITA PE PANG BALAWA SERING DI WAKTU YANG NDK TEPAT?", opsi: ["BETUL", "NENDA", "NDK JUGA"] },
+            { pertanyaan: "Pertanyaan 5: NGONI RISIH NDK PNYA TMNG ABSURB DG ANOMALI SAMA DG QT🤣🤣?", opsi: ["IYO SKLI", "NDK LAH", "LEBEH BAGUS TRE"] }
+        ];
+
+        var indexSoal = 0;
+
+        // Mulai quiz
+        function mulaiQuiz() {
+            bgm.play();
+            document.getElementById("awal").style.display = "none";
+            tampilSoal(indexSoal);
+        }
+
+        function tampilSoal(idx) {
+            if (idx >= soal.length) return;
+
+            document.getElementById("quiz").innerHTML = soal[idx].pertanyaan;
+
+            var htmlOpsi = "";
+            soal[idx].opsi.forEach(function(jawaban) {
+                htmlOpsi += "<button onclick='pilihOpsi(\"" + jawaban + "\")'>" + jawaban + "</button>";
+            });
+            document.getElementById("pilihan").innerHTML = htmlOpsi;
+
+            efekPartikel();
+        }
+
+        function pilihOpsi(jawaban) {
+            console.log("Jawaban:", jawaban);
+
+            indexSoal++;
+
+            if(indexSoal >= soal.length){
+                // Soal terakhir dijawab → efek petasan + teks akhir
+                document.getElementById("quiz").innerHTML = "";
+                document.getElementById("pilihan").innerHTML = "";
+                document.getElementById("akhir").innerHTML = "Makasih Neh So Isi, Ini Cuman Fun Neh Guys";
+                efekPetasan();
+            } else {
+                tampilSoal(indexSoal);
             }
         }
 
-        // Fungsi tombol Masuk
-        function masuk() {
-            document.getElementById("awal").style.display = "none";
-            document.getElementById("pesan").innerHTML = "Pilih Terima atau Tolak:";
-
-            document.getElementById("pilihan").innerHTML =
-                "<button onclick='terima()'>Terima 💖</button>" +
-                "<button onclick='tolak()'>Tolak 🙈</button>";
-
-            jatuhkanHati();
-        }
-
-        // Fungsi Terima
-        function terima() {
-            document.getElementById("pesan").innerHTML =
-                "YEAHHH 😍💘 Sekarang kita resmi jadi tim terbaik!";
-            document.getElementById("terimaSound").play();
-        }
-
-        // Fungsi Tolak
-        function tolak() {
-            document.getElementById("pesan").innerHTML =
-                "Gapapa kok 😅 Yang penting kamu tetap bahagia.";
-            // Tidak ada suara
-        }
-
-        // Efek hati jatuh
-        function jatuhkanHati() {
+        // =======================
+        // Efek partikel
+        function efekPartikel() {
             setInterval(function() {
-                var heart = document.createElement("div");
-                heart.classList.add("heart");
-                heart.innerHTML = "❤️";
-                heart.style.left = Math.random() * 100 + "vw";
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 3000);
-            }, 300);
+                var particle = document.createElement("div");
+                particle.classList.add("particle");
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.width = particle.style.height = (Math.random()*5 + 3) + "px";
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 3000);
+            }, 150);
         }
-    </script>
 
+        // Efek petasan / confetti
+        function efekPetasan() {
+            for(let i=0; i<50; i++){
+                let fire = document.createElement("div");
+                fire.classList.add("firework");
+                fire.style.left = Math.random()*100 + "vw";
+                fire.style.backgroundColor = "hsl(" + Math.random()*360 + ", 100%, 50%)";
+                document.body.appendChild(fire);
+                setTimeout(() => fire.remove(), 1000);
+            }
+        }
+
+    </script>
 </body>
 </html>
