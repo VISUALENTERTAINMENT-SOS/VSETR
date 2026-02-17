@@ -1,63 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDKT Music Mode</title>
+    <title>PDKT Music Ultimate</title>
     <style>
         body {
-            background-color: black;
+            background: linear-gradient(135deg, black, purple);
             color: white;
             text-align: center;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            height: 100vh;
+            margin: 0;
         }
 
         h1 {
-            margin-top: 100px;
+            margin-top: 80px;
             font-size: 40px;
             color: pink;
         }
 
         button {
             padding: 10px 20px;
-            font-size: 18px;
+            font-size: 16px;
             background-color: hotpink;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 10px;
         }
 
         button:hover {
             background-color: deeppink;
         }
+
+        .control-box {
+            margin-top: 30px;
+        }
     </style>
 </head>
 
-<body onclick="startBGM()">
+<body onclick="startBGMOnce()">
 
-    <h1>Website PDKT 💖</h1>
+    <h1>PDKT Music Mode 💖</h1>
 
     <button onclick="klikTombol(event)">Klik di sini 😉</button>
 
+    <div class="control-box">
+        <button onclick="toggleBGM()">Play / Pause Music 🎵</button>
+        <br>
+        <input type="range" min="0" max="1" step="0.1" value="0.5"
+               onchange="setVolume(this.value)">
+        <p>Volume</p>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🎵 BACKGROUND MUSIC -->
+    <!-- GANTI background.mp3 -->
     <audio id="bgm" loop>
         <source src="BGM.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- ========================= -->
+    <!-- 🔊 SOUND EFFECT -->
+    <!-- GANTI klik.mp3 -->
     <audio id="clickSound">
         <source src="SD.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        function startBGM() {
-            document.getElementById("bgm").play();
-            document.body.onclick = null; 
+        var bgm = document.getElementById("bgm");
+        var started = false;
+
+        // Mulai BGM saat klik pertama kali
+        function startBGMOnce() {
+            if (!started) {
+                bgm.volume = 0;
+                bgm.play();
+                fadeIn();
+                started = true;
+            }
         }
 
+        // Fade in halus
+        function fadeIn() {
+            var volume = 0;
+            var interval = setInterval(function() {
+                if (volume < 0.5) {
+                    volume += 0.05;
+                    bgm.volume = volume;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+
+        // Tombol klik
         function klikTombol(event) {
-            event.stopPropagation(); // supaya gak restart BGM
+            event.stopPropagation();
             document.getElementById("clickSound").play();
             alert("Haiii 😎✨");
         }
+
+        // Play / Pause
+        function toggleBGM() {
+            if (bgm.paused) {
+                bgm.play();
+            } else {
+                bgm.pause();
+            }
+        }
+
+        // Volume control
+        function setVolume(value) {
+            bgm.volume = value;
+        }
+
     </script>
 
 </body>
