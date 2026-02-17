@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDKT Simple Sound</title>
+    <title>PDKT Interaktif</title>
     <style>
         body {
             background-color: black;
@@ -51,32 +51,46 @@
     </style>
 </head>
 
-<body>
+<body onclick="mulaiBGM()">
 
-    <h1>PDKT Mode 💖</h1>
+    <h1>Selamat Datang 💖</h1>
 
-    <button onclick="tampilkanPilihan()">Klik di sini 😉</button>
+    <div id="awal">
+        <button onclick="masuk()">Masuk 🚪</button>
+    </div>
 
     <div id="pesan"></div>
     <div id="pilihan"></div>
 
     <!-- ========================= -->
     <!-- 🎵 BACKGROUND MUSIC -->
-    <!-- GANTI background.mp3 -->
-    <audio id="bgm" autoplay loop>
+    <!-- GANTI background.mp3 DENGAN FILE BGM KAMU -->
+    <audio id="bgm" loop>
         <source src="BGM.mp3" type="audio/mpeg">
     </audio>
 
     <!-- 🔊 SOUND TERIMA -->
-    <!-- GANTI terima.mp3 -->
+    <!-- GANTI terima.mp3 DENGAN FILE SUARA TERIMA -->
     <audio id="terimaSound">
         <source src="SD.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        function tampilkanPilihan() {
-            document.getElementById("pesan").innerHTML =
-                "Haiii 😎✨ Pilih Terima atau Tolak:";
+        var bgm = document.getElementById("bgm");
+        var bgmStarted = false;
+
+        // Mulai BGM setelah klik pertama di layar
+        function mulaiBGM() {
+            if (!bgmStarted) {
+                bgm.play();
+                bgmStarted = true;
+            }
+        }
+
+        // Fungsi tombol Masuk
+        function masuk() {
+            document.getElementById("awal").style.display = "none";
+            document.getElementById("pesan").innerHTML = "Pilih Terima atau Tolak:";
 
             document.getElementById("pilihan").innerHTML =
                 "<button onclick='terima()'>Terima 💖</button>" +
@@ -85,18 +99,21 @@
             jatuhkanHati();
         }
 
+        // Fungsi Terima
         function terima() {
             document.getElementById("pesan").innerHTML =
                 "YEAHHH 😍💘 Sekarang kita resmi jadi tim terbaik!";
             document.getElementById("terimaSound").play();
         }
 
+        // Fungsi Tolak
         function tolak() {
             document.getElementById("pesan").innerHTML =
                 "Gapapa kok 😅 Yang penting kamu tetap bahagia.";
             // Tidak ada suara
         }
 
+        // Efek hati jatuh
         function jatuhkanHati() {
             setInterval(function() {
                 var heart = document.createElement("div");
