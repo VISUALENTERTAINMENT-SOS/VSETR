@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDKT Ultimate Mode</title>
+    <title>PDKT Music Mode</title>
     <style>
         body {
             background-color: black;
@@ -9,11 +9,10 @@
             text-align: center;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            transition: background-color 1s;
         }
 
         h1 {
-            margin-top: 80px;
+            margin-top: 100px;
             font-size: 40px;
             color: pink;
         }
@@ -25,116 +24,39 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin: 10px;
+            margin-top: 20px;
         }
 
         button:hover {
             background-color: deeppink;
         }
-
-        #pesan {
-            margin-top: 30px;
-            font-size: 24px;
-            color: lightyellow;
-        }
-
-        .heart {
-            position: absolute;
-            color: red;
-            font-size: 20px;
-            animation: fall 3s linear infinite;
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(-10vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            animation: confettiFall 3s linear infinite;
-        }
-
-        @keyframes confettiFall {
-            0% { transform: translateY(-10vh) rotate(0deg); }
-            100% { transform: translateY(100vh) rotate(360deg); }
-        }
     </style>
 </head>
 
-<body>
+<body onclick="startBGM()">
 
-    <h1>PDKT Mode 💖</h1>
+    <h1>Website PDKT 💖</h1>
 
-    <button onclick="mulaiPDKT()">Klik di sini 😉</button>
+    <button onclick="klikTombol(event)">Klik di sini 😉</button>
 
-    <div id="pesan"></div>
-    <div id="pilihan"></div>
-
-    <!-- ======================= -->
-    <!-- 🔊 BAGIAN SOUND DI SINI -->
-    <!-- ======================= -->
-
-    <audio id="sound">
-        <!-- GANTI "sound.mp3" DENGAN NAMA FILE MP3 KAMU -->
-        <source src="sound.mp3" type="audio/mpeg">
+    <audio id="bgm" loop>
+        <source src="BGM.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- ======================= -->
+    <audio id="clickSound">
+        <source src="SD.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        function mulaiPDKT() {
-
-            // 🔊 Sound diputar di sini
-            document.getElementById("sound").play();
-
-            document.getElementById("pesan").innerHTML =
-                "Haiii... kamu tau gak? Aku seneng banget kamu ada di sini 😌✨";
-
-            document.getElementById("pilihan").innerHTML =
-                "<br><button onclick='terima()'>Terima 💖</button>" +
-                "<button onclick='tolak()'>Tolak 🙈</button>";
-
-            jatuhkanHati();
+        function startBGM() {
+            document.getElementById("bgm").play();
+            document.body.onclick = null; 
         }
 
-        function terima() {
-            document.body.style.backgroundColor = "#ff69b4";
-            document.getElementById("pesan").innerHTML =
-                "YEAHHH 😍💘 Sekarang kita resmi jadi tim terbaik sedunia!";
-            confetti();
-        }
-
-        function tolak() {
-            document.getElementById("pesan").innerHTML =
-                "Gapapa kok 😅 Yang penting kamu tetap bahagia.";
-        }
-
-        function jatuhkanHati() {
-            setInterval(function() {
-                var heart = document.createElement("div");
-                heart.classList.add("heart");
-                heart.innerHTML = "❤️";
-                heart.style.left = Math.random() * 100 + "vw";
-                document.body.appendChild(heart);
-
-                setTimeout(() => heart.remove(), 3000);
-            }, 300);
-        }
-
-        function confetti() {
-            setInterval(function() {
-                var conf = document.createElement("div");
-                conf.classList.add("confetti");
-                conf.style.left = Math.random() * 100 + "vw";
-                conf.style.background =
-                    "hsl(" + Math.random() * 360 + ", 100%, 50%)";
-                document.body.appendChild(conf);
-
-                setTimeout(() => conf.remove(), 3000);
-            }, 200);
+        function klikTombol(event) {
+            event.stopPropagation(); // supaya gak restart BGM
+            document.getElementById("clickSound").play();
+            alert("Haiii 😎✨");
         }
     </script>
 
