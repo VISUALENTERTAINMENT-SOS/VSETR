@@ -9,6 +9,7 @@
             text-align: center;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            position: relative;
         }
 
         h1 {
@@ -44,7 +45,7 @@
             color: white;
         }
 
-        /* Partikel */
+        /* Partikel kecil selama quiz */
         .particle {
             position: absolute;
             border-radius: 50%;
@@ -60,11 +61,11 @@
             100% { transform: translateY(100vh); opacity: 0; }
         }
 
-        /* Petasan */
+        /* Petasan / confetti */
         .firework {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             animation: explode 1s forwards;
         }
@@ -78,8 +79,9 @@
 </head>
 <body>
 
-    <h1>SELAMAT DATANG</h1>
+    <h1>Selamat Datang</h1>
     <p class="sambutan">INI CUMAN PERTANYAAN TENTANG NGONI PE PANDAGAN KITA PE SIKAP BAGIMANA NEH, CUMAN FUN FUN KWA AMANNN :)</p>
+ :)</p>
 
     <div id="awal">
         <button onclick="mulaiQuiz()">Masuk</button>
@@ -91,13 +93,12 @@
 
     <!-- BGM -->
     <audio id="bgm" loop>
-        <source src="BGM.mp3" type="audio/mpeg">
+        <source src="background.mp3" type="audio/mpeg">
     </audio>
 
     <script>
         var bgm = document.getElementById("bgm");
 
-        // =========================
         // DATA QUIZ
         var soal = [
             { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
@@ -108,12 +109,14 @@
         ];
 
         var indexSoal = 0;
+        var partikelInterval;
 
-        // Mulai quiz
+        // =========================
         function mulaiQuiz() {
             bgm.play();
             document.getElementById("awal").style.display = "none";
             tampilSoal(indexSoal);
+            partikelInterval = setInterval(efekPartikel, 150); // partikel jalan terus selama quiz
         }
 
         function tampilSoal(idx) {
@@ -126,8 +129,6 @@
                 htmlOpsi += "<button onclick='pilihOpsi(\"" + jawaban + "\")'>" + jawaban + "</button>";
             });
             document.getElementById("pilihan").innerHTML = htmlOpsi;
-
-            efekPartikel();
         }
 
         function pilihOpsi(jawaban) {
@@ -136,7 +137,8 @@
             indexSoal++;
 
             if(indexSoal >= soal.length){
-                // Soal terakhir dijawab → efek petasan + teks akhir
+                // Quiz selesai → hentikan partikel & tampilkan efek petasan + teks akhir
+                clearInterval(partikelInterval);
                 document.getElementById("quiz").innerHTML = "";
                 document.getElementById("pilihan").innerHTML = "";
                 document.getElementById("akhir").innerHTML = "Makasih Neh So Isi, Ini Cuman Fun Neh Guys";
@@ -147,30 +149,32 @@
         }
 
         // =======================
-        // Efek partikel
+        // Efek partikel kecil
         function efekPartikel() {
-            setInterval(function() {
-                var particle = document.createElement("div");
-                particle.classList.add("particle");
-                particle.style.left = Math.random() * 100 + "vw";
-                particle.style.width = particle.style.height = (Math.random()*5 + 3) + "px";
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 3000);
-            }, 150);
+            var particle = document.createElement("div");
+            particle.classList.add("particle");
+            particle.style.left = Math.random() * 100 + "vw";
+            particle.style.width = particle.style.height = (Math.random()*5 + 3) + "px";
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 3000);
         }
 
-        // Efek petasan / confetti
+        // Efek petasan / confetti lebih jelas
         function efekPetasan() {
-            for(let i=0; i<50; i++){
+            for(let i=0; i<100; i++){ // jumlah partikel lebih banyak
                 let fire = document.createElement("div");
                 fire.classList.add("firework");
                 fire.style.left = Math.random()*100 + "vw";
+                fire.style.top = Math.random()*80 + "vh"; // mulai dari random tinggi
+                fire.style.width = fire.style.height = (Math.random()*10 + 5) + "px";
                 fire.style.backgroundColor = "hsl(" + Math.random()*360 + ", 100%, 50%)";
+                fire.style.animationDuration = (Math.random()*0.8 + 0.8) + "s"; // durasi random
                 document.body.appendChild(fire);
-                setTimeout(() => fire.remove(), 1000);
+                setTimeout(() => fire.remove(), 1500);
             }
         }
 
     </script>
+
 </body>
 </html>
