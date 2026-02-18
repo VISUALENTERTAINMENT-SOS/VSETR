@@ -1,181 +1,191 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun Quiz Mobile</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            min-height: 100vh;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fun Quiz Mobile + Firebase</title>
+<style>
+body {
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    min-height: 100vh;
+}
+h1 { margin-top: 30px; font-size: 28px; color: white; padding: 0 10px; }
+p.sambutan { margin: 15px 10px; font-size: 16px; line-height: 1.4; color: white; }
 
-        h1 {
-            margin-top: 30px;
-            font-size: 28px;
-            color: white;
-            padding: 0 10px;
-        }
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #ff69b4;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px 0;
+    color: white;
+    width: 75%;
+    max-width: 300px;
+}
+button:hover { background-color: #ff1493; }
 
-        p.sambutan {
-            margin: 15px 10px;
-            font-size: 16px;
-            line-height: 1.4;
-            color: white;
-        }
+#quiz, #akhir { margin-top: 20px; font-size: 18px; color: white; padding: 0 10px; }
 
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            background-color: #ff69b4;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-            color: white;
-            width: 75%;       /* Tombol responsive */
-            max-width: 300px;
-        }
+/* Partikel kecil */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: white;
+    width: 5px; height: 5px;
+    opacity: 0.8;
+    animation: fall 3s linear forwards;
+}
+@keyframes fall { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
 
-        button:hover {
-            background-color: #ff1493;
-        }
-
-        #quiz, #akhir {
-            margin-top: 20px;
-            font-size: 18px;
-            color: white;
-            padding: 0 10px;
-        }
-
-        /* Partikel kecil selama quiz */
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background-color: white;
-            width: 5px;
-            height: 5px;
-            opacity: 0.8;
-            animation: fall 3s linear forwards;
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        /* Petasan / confetti */
-        .firework {
-            position: absolute;
-            border-radius: 50%;
-            animation: explode 1s forwards;
-        }
-
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(5) translateY(-200px) translateX(200px); opacity: 0; }
-        }
-
-    </style>
+/* Petasan / confetti */
+.firework {
+    position: absolute;
+    border-radius: 50%;
+    animation: explode 1s forwards;
+}
+@keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(5) translateY(-200px) translateX(200px); opacity: 0; } }
+</style>
 </head>
 <body>
 
-    <h1>Selamat Datang</h1>
-    <p class="sambutan">INI CUMAN PERTANYAAN TENTANG NGONI PE PANDAGAN KITA PE SIKAP BAGIMANA NEH, CUMAN FUN FUN KWA AMANNN :)</p>
-    <p class="sambutan">AKAN ADA LAGU SETELAH INI JADI MOHON VOLUME DI KECILKAN KALAU ANDA MAU </p>
+<h1>Selamat Datang</h1>
+<p class="sambutan">SELAMAT DATANG GUYS, INI WEB TENTANG PANDANGAN KALIAN TENTANG AKU, CUMAN FUN FUN :)</p>
+<p class="sambutan">AKAN ADA LAGU SETELAH INI, MOHON DIKECILKAN VOLUMENYA JIKA PERLU</p>
 
-    <div id="awal">
-        <button onclick="mulaiQuiz()">Masuk</button>
-    </div>
+<div id="awal">
+    <button onclick="mulaiQuiz()">Masuk</button>
+</div>
 
-    <div id="quiz"></div>
-    <div id="pilihan"></div>
-    <div id="akhir"></div>
+<div id="quiz"></div>
+<div id="pilihan"></div>
+<div id="akhir"></div>
 
-    <!-- BGM -->
-    <audio id="bgm" loop>
-        <source src="BGM4.mp3" type="audio/mpeg">
-    </audio>
+<!-- BGM -->
+<audio id="bgm" loop>
+    <source src="BGM4.mp3" type="audio/mpeg">
+</audio>
 
-    <script>
-        var bgm = document.getElementById("bgm");
+<!-- Firebase Module -->
+<script type="module">
+  // Import Firebase App dan Analytics
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-        var soal = [
-            { pertanyaan: "MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
-            { pertanyaan: "NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
-            { pertanyaan: "ADA KH TPE TINDAKAN YANG PERNA BKNG NGONI KESAL ATO MARAH 😂?", opsi: ["ADA", "NDAK", "BANYA KALI"] },
-            { pertanyaan: "Pertanyaan APAKAH KITA PE PANG BALAWA SERING DI WAKTU YANG NDK TEPAT?", opsi: ["BETUL", "NENDA", "NDK JUGA"] },
-            { pertanyaan: "NGONI RISIH NDK PNYA TMNG ABSURB DG ANOMALI SAMA DG QT🤣🤣?", opsi: ["IYO SKLI", "NDK LAH", "LEBEH BAGUS TRE"] }
-        ];
+  // Firebase Config → ganti sesuai projectmu
+  const firebaseConfig = {
+    apiKey: "AIzaSyCsNCyeFGW9PkJqMHJOy9q17cM1CcnB3_U",
+    authDomain: "vstre0302.firebaseapp.com",
+    databaseURL: "https://vstre0302-default-rtdb.firebaseio.com",
+    projectId: "vstre0302",
+    storageBucket: "vstre0302.firebasestorage.app",
+    messagingSenderId: "249350691690",
+    appId: "1:249350691690:web:7e0bf05ef52c358384e313",
+    measurementId: "G-GLR5Y31NP9"
+  };
 
-        var indexSoal = 0;
-        var partikelInterval;
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
 
-        function mulaiQuiz() {
-            bgm.play();
-            document.getElementById("awal").style.display = "none";
-            tampilSoal(indexSoal);
-            partikelInterval = setInterval(efekPartikel, 150);
-        }
+  // Initialize Realtime Database
+  const database = getDatabase(app);
 
-        function tampilSoal(idx) {
-            if (idx >= soal.length) return;
+  // Fungsi kirim jawaban ke database
+  function kirimJawaban(user, indexSoal, jawaban) {
+    const refQuiz = ref(database, 'quizJawaban');
+    push(refQuiz, {
+      user: user,
+      soal: indexSoal + 1,
+      jawaban: jawaban,
+      waktu: new Date().toISOString()
+    })
+    .then(() => console.log("Jawaban tersimpan!"))
+    .catch((error) => console.error("Gagal simpan jawaban:", error));
+  }
 
-            document.getElementById("quiz").innerHTML = soal[idx].pertanyaan;
+  // Supaya bisa dipakai di HTML / JS quiz
+  window.kirimJawaban = kirimJawaban;
+</script>
 
-            var htmlOpsi = "";
-            soal[idx].opsi.forEach(function(jawaban) {
-                htmlOpsi += "<button onclick='pilihOpsi(\"" + jawaban + "\")'>" + jawaban + "</button>";
-            });
-            document.getElementById("pilihan").innerHTML = htmlOpsi;
-        }
+<script>
+var bgm = document.getElementById("bgm");
+var soal = [
+    { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
+    { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
+    { pertanyaan: "Pertanyaan 3: ADA KH TPE TINDAKAN YANG PERNA BKNG NGONI KESAL ATO MARAH?", opsi: ["ADA", "NDAK", "BANYA KALI"] },
+    { pertanyaan: "Pertanyaan 4: APAKAH KITA PE PANG BALAWA SERING DI WAKTU YANG NDK TEPAT?", opsi: ["BETUL", "NENDA", "NDK JUGA"] },
+    { pertanyaan: "Pertanyaan 5: NGONI RISIH NDK PNYA TMNG ABSURB DG ANOMALI SAMA DG QT?", opsi: ["IYO SKLI", "NDK LAH", "LEBEH BAGUS TRE"] }
+];
 
-        function pilihOpsi(jawaban) {
-            console.log("Jawaban:", jawaban);
+var indexSoal = 0;
+var partikelInterval;
 
-            indexSoal++;
+function mulaiQuiz() {
+    bgm.play();
+    document.getElementById("awal").style.display = "none";
+    tampilSoal(indexSoal);
+    partikelInterval = setInterval(efekPartikel, 150);
+}
 
-            if(indexSoal >= soal.length){
-                clearInterval(partikelInterval);
-                document.getElementById("quiz").innerHTML = "";
-                document.getElementById("pilihan").innerHTML = "";
-                document.getElementById("akhir").innerHTML = "DAN TERIMA KASIH SO ISI NEH GUYS ITU KWA CMAN TUGAS JADI HANYA FUN SAJA";
-                efekPetasan();
-            } else {
-                tampilSoal(indexSoal);
-            }
-        }
+function tampilSoal(idx) {
+    if (idx >= soal.length) return;
+    document.getElementById("quiz").innerHTML = soal[idx].pertanyaan;
+    var htmlOpsi = "";
+    soal[idx].opsi.forEach(function(jawaban) {
+        htmlOpsi += "<button onclick='pilihOpsi(\"" + jawaban + "\")'>" + jawaban + "</button>";
+    });
+    document.getElementById("pilihan").innerHTML = htmlOpsi;
+}
 
-        function efekPartikel() {
-            var particle = document.createElement("div");
-            particle.classList.add("particle");
-            particle.style.left = Math.random() * 100 + "vw";
-            particle.style.width = particle.style.height = (Math.random()*5 + 3) + "px";
-            document.body.appendChild(particle);
-            setTimeout(() => particle.remove(), 3000);
-        }
+function pilihOpsi(jawaban) {
+    // Kirim jawaban ke Firebase
+    kirimJawaban("USER1", indexSoal, jawaban);
 
-        function efekPetasan() {
-            for(let i=0; i<100; i++){
-                let fire = document.createElement("div");
-                fire.classList.add("firework");
-                fire.style.left = Math.random()*100 + "vw";
-                fire.style.top = Math.random()*80 + "vh";
-                fire.style.width = fire.style.height = (Math.random()*10 + 5) + "px";
-                fire.style.backgroundColor = "hsl(" + Math.random()*360 + ", 100%, 50%)";
-                fire.style.animationDuration = (Math.random()*0.8 + 0.8) + "s";
-                document.body.appendChild(fire);
-                setTimeout(() => fire.remove(), 1500);
-            }
-        }
+    indexSoal++;
+    if(indexSoal >= soal.length){
+        clearInterval(partikelInterval);
+        document.getElementById("quiz").innerHTML = "";
+        document.getElementById("pilihan").innerHTML = "";
+        document.getElementById("akhir").innerHTML = "MAKASIH YA UDAH ISI SOALNYA, CUMAN FUN FUN SAJA";
+        efekPetasan();
+    } else {
+        tampilSoal(indexSoal);
+    }
+}
 
-    </script>
+// =======================
+function efekPartikel() {
+    var particle = document.createElement("div");
+    particle.classList.add("particle");
+    particle.style.left = Math.random() * 100 + "vw";
+    particle.style.width = particle.style.height = (Math.random()*5 + 3) + "px";
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 3000);
+}
+
+function efekPetasan() {
+    for(let i=0; i<100; i++){
+        let fire = document.createElement("div");
+        fire.classList.add("firework");
+        fire.style.left = Math.random()*100 + "vw";
+        fire.style.top = Math.random()*80 + "vh";
+        fire.style.width = fire.style.height = (Math.random()*10 + 5) + "px";
+        fire.style.backgroundColor = "hsl(" + Math.random()*360 + ", 100%, 50%)";
+        fire.style.animationDuration = (Math.random()*0.8 + 0.8) + "s";
+        document.body.appendChild(fire);
+        setTimeout(() => fire.remove(), 1500);
+    }
+}
+</script>
 
 </body>
 </html>
