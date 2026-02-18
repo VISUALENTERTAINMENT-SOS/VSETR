@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fun Quiz Mobile + Firebase</title>
+<title>Fun Quiz + Firebase</title>
 <style>
 body {
     background-color: black;
@@ -15,8 +16,18 @@ body {
     position: relative;
     min-height: 100vh;
 }
-h1 { margin-top: 30px; font-size: 28px; color: white; padding: 0 10px; }
-p.sambutan { margin: 15px 10px; font-size: 16px; line-height: 1.4; color: white; }
+h1 { margin-top: 30px; font-size: 28px; padding: 0 10px; }
+p.sambutan { margin: 15px 10px; font-size: 16px; line-height: 1.4; }
+
+input[name="username"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 70%;
+    max-width: 300px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+}
 
 button {
     padding: 12px 25px;
@@ -32,7 +43,7 @@ button {
 }
 button:hover { background-color: #ff1493; }
 
-#quiz, #akhir { margin-top: 20px; font-size: 18px; color: white; padding: 0 10px; }
+#quiz, #akhir { margin-top: 20px; font-size: 18px; padding: 0 10px; }
 
 /* Partikel kecil */
 .particle {
@@ -57,11 +68,12 @@ button:hover { background-color: #ff1493; }
 <body>
 
 <h1>Selamat Datang</h1>
-<p class="sambutan">SELAMAT DATANG GUYS, INI WEB TENTANG PANDANGAN KALIAN TENTANG AKU, CUMAN FUN FUN :)</p>
-<p class="sambutan">AKAN ADA LAGU SETELAH INI, MOHON DIKECILKAN VOLUMENYA JIKA PERLU</p>
+<p class="sambutan">SELAMAT DATANG GUYS, ISI NAMA DULU YA, INI WEB FUN FUN TENTANG PANDANGAN KALIAN :)</p>
 
 <div id="awal">
-    <button onclick="mulaiQuiz()">Masuk</button>
+    <input type="text" id="username" placeholder="Masukkan Nama Kamu" />
+    <br>
+    <button onclick="setUsername()">Mulai</button>
 </div>
 
 <div id="quiz"></div>
@@ -75,13 +87,12 @@ button:hover { background-color: #ff1493; }
 
 <!-- Firebase Module -->
 <script type="module">
-  // Import Firebase App dan Analytics
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-  // Firebase Config → ganti sesuai projectmu
-  const firebaseConfig = {
+// Firebase Config
+const firebaseConfig = {
     apiKey: "AIzaSyCsNCyeFGW9PkJqMHJOy9q17cM1CcnB3_U",
     authDomain: "vstre0302.firebaseapp.com",
     databaseURL: "https://vstre0302-default-rtdb.firebaseio.com",
@@ -90,34 +101,31 @@ button:hover { background-color: #ff1493; }
     messagingSenderId: "249350691690",
     appId: "1:249350691690:web:7e0bf05ef52c358384e313",
     measurementId: "G-GLR5Y31NP9"
-  };
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const database = getDatabase(app);
 
-  // Initialize Realtime Database
-  const database = getDatabase(app);
-
-  // Fungsi kirim jawaban ke database
-  function kirimJawaban(user, indexSoal, jawaban) {
+// Fungsi kirim jawaban ke Firebase
+function kirimJawaban(user, indexSoal, jawaban) {
     const refQuiz = ref(database, 'quizJawaban');
     push(refQuiz, {
-      user: user,
-      soal: indexSoal + 1,
-      jawaban: jawaban,
-      waktu: new Date().toISOString()
+        user: user,
+        soal: indexSoal + 1,
+        jawaban: jawaban,
+        waktu: new Date().toISOString()
     })
     .then(() => console.log("Jawaban tersimpan!"))
     .catch((error) => console.error("Gagal simpan jawaban:", error));
-  }
+}
 
-  // Supaya bisa dipakai di HTML / JS quiz
-  window.kirimJawaban = kirimJawaban;
+window.kirimJawaban = kirimJawaban;
 </script>
 
 <script>
 var bgm = document.getElementById("bgm");
+var userName = ""; // akan diisi user
 var soal = [
     { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
     { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
@@ -129,15 +137,25 @@ var soal = [
 var indexSoal = 0;
 var partikelInterval;
 
+function setUsername() {
+    const input = document.getElementById("username").value.trim();
+    if(input === "") {
+        alert("Masukkan nama dulu!");
+        return;
+    }
+    userName = input;
+    document.getElementById("awal").style.display = "none";
+    mulaiQuiz();
+}
+
 function mulaiQuiz() {
     bgm.play();
-    document.getElementById("awal").style.display = "none";
     tampilSoal(indexSoal);
     partikelInterval = setInterval(efekPartikel, 150);
 }
 
 function tampilSoal(idx) {
-    if (idx >= soal.length) return;
+    if(idx >= soal.length) return;
     document.getElementById("quiz").innerHTML = soal[idx].pertanyaan;
     var htmlOpsi = "";
     soal[idx].opsi.forEach(function(jawaban) {
@@ -147,15 +165,15 @@ function tampilSoal(idx) {
 }
 
 function pilihOpsi(jawaban) {
-    // Kirim jawaban ke Firebase
-    kirimJawaban("USER1", indexSoal, jawaban);
+    // Kirim jawaban ke Firebase pakai nama user yang diinput
+    kirimJawaban(userName, indexSoal, jawaban);
 
     indexSoal++;
     if(indexSoal >= soal.length){
         clearInterval(partikelInterval);
         document.getElementById("quiz").innerHTML = "";
         document.getElementById("pilihan").innerHTML = "";
-        document.getElementById("akhir").innerHTML = "MAKASIH YA UDAH ISI SOALNYA, CUMAN FUN FUN SAJA";
+        document.getElementById("akhir").innerHTML = "MAKASIH YA UDAH ISI SOALNYA, CUMAN FUN FUN :)";
         efekPetasan();
     } else {
         tampilSoal(indexSoal);
