@@ -1,38 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Fun Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Quiz Mobile</title>
     <style>
         body {
             background-color: black;
             color: white;
             text-align: center;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
             position: relative;
+            min-height: 100vh;
         }
 
         h1 {
-            margin-top: 40px;
-            font-size: 36px;
+            margin-top: 30px;
+            font-size: 28px;
             color: white;
+            padding: 0 10px;
         }
 
         p.sambutan {
-            margin-top: 30px;
-            font-size: 22px;
+            margin: 15px 10px;
+            font-size: 16px;
+            line-height: 1.4;
             color: white;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 18px;
             background-color: #ff69b4;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin: 10px;
+            margin: 10px 0;
             color: white;
+            width: 75%;       /* Tombol responsive */
+            max-width: 300px;
         }
 
         button:hover {
@@ -40,9 +48,10 @@
         }
 
         #quiz, #akhir {
-            margin-top: 30px;
-            font-size: 24px;
+            margin-top: 20px;
+            font-size: 18px;
             color: white;
+            padding: 0 10px;
         }
 
         /* Partikel kecil selama quiz */
@@ -64,8 +73,6 @@
         /* Petasan / confetti */
         .firework {
             position: absolute;
-            width: 10px;
-            height: 10px;
             border-radius: 50%;
             animation: explode 1s forwards;
         }
@@ -99,7 +106,6 @@
     <script>
         var bgm = document.getElementById("bgm");
 
-        // DATA QUIZ
         var soal = [
             { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
             { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
@@ -111,12 +117,11 @@
         var indexSoal = 0;
         var partikelInterval;
 
-        // =========================
         function mulaiQuiz() {
             bgm.play();
             document.getElementById("awal").style.display = "none";
             tampilSoal(indexSoal);
-            partikelInterval = setInterval(efekPartikel, 150); // partikel jalan terus selama quiz
+            partikelInterval = setInterval(efekPartikel, 150);
         }
 
         function tampilSoal(idx) {
@@ -137,7 +142,6 @@
             indexSoal++;
 
             if(indexSoal >= soal.length){
-                // Quiz selesai → hentikan partikel & tampilkan efek petasan + teks akhir
                 clearInterval(partikelInterval);
                 document.getElementById("quiz").innerHTML = "";
                 document.getElementById("pilihan").innerHTML = "";
@@ -148,8 +152,6 @@
             }
         }
 
-        // =======================
-        // Efek partikel kecil
         function efekPartikel() {
             var particle = document.createElement("div");
             particle.classList.add("particle");
@@ -159,16 +161,15 @@
             setTimeout(() => particle.remove(), 3000);
         }
 
-        // Efek petasan / confetti lebih jelas
         function efekPetasan() {
-            for(let i=0; i<100; i++){ // jumlah partikel lebih banyak
+            for(let i=0; i<100; i++){
                 let fire = document.createElement("div");
                 fire.classList.add("firework");
                 fire.style.left = Math.random()*100 + "vw";
-                fire.style.top = Math.random()*80 + "vh"; // mulai dari random tinggi
+                fire.style.top = Math.random()*80 + "vh";
                 fire.style.width = fire.style.height = (Math.random()*10 + 5) + "px";
                 fire.style.backgroundColor = "hsl(" + Math.random()*360 + ", 100%, 50%)";
-                fire.style.animationDuration = (Math.random()*0.8 + 0.8) + "s"; // durasi random
+                fire.style.animationDuration = (Math.random()*0.8 + 0.8) + "s";
                 document.body.appendChild(fire);
                 setTimeout(() => fire.remove(), 1500);
             }
