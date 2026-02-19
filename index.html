@@ -19,7 +19,7 @@ body {
 h1 { margin-top: 30px; font-size: 28px; padding: 0 10px; }
 p.sambutan { margin: 15px 10px; font-size: 16px; line-height: 1.4; }
 
-input[name="username"] {
+input[name="username"], #username {
     padding: 10px;
     font-size: 16px;
     width: 70%;
@@ -54,21 +54,27 @@ button:hover { background-color: #ff1493; }
     opacity: 0.8;
     animation: fall 3s linear forwards;
 }
-@keyframes fall { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }
+@keyframes fall {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
 
-/* Petasan / confetti */
+/* Petasan */
 .firework {
     position: absolute;
     border-radius: 50%;
     animation: explode 1s forwards;
 }
-@keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(5) translateY(-200px) translateX(200px); opacity: 0; } }
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(5) translateY(-200px) translateX(200px); opacity: 0; }
+}
 </style>
 </head>
 <body>
 
-<h1>WELCOME TO MY WEBSITE</h1>
-<p class="sambutan">SEBELUM LANJUT, ISI NAMA DULU YA, INI WEB FUN FUN TENTANG NOGNI PE PANDAGAN PA QT :)</p>
+<h1>Selamat Datang</h1>
+<p class="sambutan">SELAMAT DATANG GUYS, ISI NAMA DULU YA, INI WEB FUN FUN TENTANG PANDANGAN KALIAN :)</p>
 
 <div id="awal">
     <input type="text" id="username" placeholder="Masukkan Nama Kamu" />
@@ -83,10 +89,8 @@ button:hover { background-color: #ff1493; }
 <!-- Firebase Module -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyCsNCyeFGW9PkJqMHJOy9q17cM1CcnB3_U",
     authDomain: "vstre0302.firebaseapp.com",
@@ -94,16 +98,13 @@ const firebaseConfig = {
     projectId: "vstre0302",
     storageBucket: "vstre0302.firebasestorage.app",
     messagingSenderId: "249350691690",
-    appId: "1:249350691690:web:7e0bf05ef52c358384e313",
-    measurementId: "G-GLR5Y31NP9"
+    appId: "1:249350691690:web:7e0bf05ef52c358384e313"
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const database = getDatabase(app);
 
-// Fungsi kirim jawaban ke Firebase
-function kirimJawaban(user, indexSoal, jawaban) {
+window.kirimJawaban = function(user, indexSoal, jawaban) {
     const refQuiz = ref(database, 'quizJawaban');
     push(refQuiz, {
         user: user,
@@ -113,20 +114,17 @@ function kirimJawaban(user, indexSoal, jawaban) {
     })
     .then(() => console.log("Jawaban tersimpan!"))
     .catch((error) => console.error("Gagal simpan jawaban:", error));
-}
-
-window.kirimJawaban = kirimJawaban;
+};
 </script>
 
 <script>
-var bgm = document.getElementById("bgm");
-var userName = ""; // akan diisi user
+var userName = "";
 var soal = [
     { pertanyaan: "Pertanyaan 1: MENURUT NGONI KITA INI PAMBAE ATO NDK?", opsi: ["PAMBAE", "NENDA", "STO"] },
-    { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA😂😂?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
+    { pertanyaan: "Pertanyaan 2: NGONI KADANG RISIH NDK KLO KITA BA LAWA?", opsi: ["IYOO NOH", "NENDA YA", "KADANG KADANG"] },
     { pertanyaan: "Pertanyaan 3: ADA KH TPE TINDAKAN YANG PERNA BKNG NGONI KESAL ATO MARAH?", opsi: ["ADA", "NDAK", "BANYA KALI"] },
-    { pertanyaan: "Pertanyaan 4: APAKAH KITA PE PANG BALAWA SERING DI WAKTU YANG NDK TEPAT?", opsi: ["BETUL", "NENDA", "KADANG KADANG"] },
-    { pertanyaan: "Pertanyaan 5: NGONI RISIH NDK PNYA TMNG ABSURB DG ANOMALI SAMA DG QT🤣🤣?", opsi: ["IYO SKLI", "NDK LAH", "LEBEH BAGUS TRE"] }
+    { pertanyaan: "Pertanyaan 4: APAKAH KITA PE PANG BALAWA SERING DI WAKTU YANG NDK TEPAT?", opsi: ["BETUL", "NENDA", "NDK JUGA"] },
+    { pertanyaan: "Pertanyaan 5: NGONI RISIH NDK PNYA TMNG ABSURB DG ANOMALI SAMA DG QT?", opsi: ["IYO SKLI", "NDK LAH", "LEBEH BAGUS TRE"] }
 ];
 
 var indexSoal = 0;
@@ -144,7 +142,6 @@ function setUsername() {
 }
 
 function mulaiQuiz() {
-    bgm.play();
     tampilSoal(indexSoal);
     partikelInterval = setInterval(efekPartikel, 150);
 }
@@ -160,7 +157,6 @@ function tampilSoal(idx) {
 }
 
 function pilihOpsi(jawaban) {
-    // Kirim jawaban ke Firebase pakai nama user yang diinput
     kirimJawaban(userName, indexSoal, jawaban);
 
     indexSoal++;
@@ -168,14 +164,13 @@ function pilihOpsi(jawaban) {
         clearInterval(partikelInterval);
         document.getElementById("quiz").innerHTML = "";
         document.getElementById("pilihan").innerHTML = "";
-        document.getElementById("akhir").innerHTML = "MAKASIH NEH SO ISI DPE SOAL, INI ADALAH TUGAS DAN CUMAN FUN FUN NEH GUYS :)";
+        document.getElementById("akhir").innerHTML = "MAKASIH YA UDAH ISI SOALNYA, CUMAN FUN FUN :)";
         efekPetasan();
     } else {
         tampilSoal(indexSoal);
     }
 }
 
-// =======================
 function efekPartikel() {
     var particle = document.createElement("div");
     particle.classList.add("particle");
